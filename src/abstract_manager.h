@@ -1,0 +1,10 @@
+#ifndef C__MQSPARK_ABSTRACT_MANAGER_H
+#define C__MQSPARK_ABSTRACT_MANAGER_H
+
+
+class AbstractManager
+{
+};
+
+
+#endif//C__MQSPARK_ABSTRACT_MANAGER_H
