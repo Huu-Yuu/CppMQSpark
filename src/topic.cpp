@@ -11,7 +11,7 @@ void Topic::Publish(const Message &msg)
 {
     for(const auto& clent : m_clents)
     {
-        if(!clent)
+        if(clent)
         {
             clent->HandleMessage(msg);
         }
@@ -21,6 +21,7 @@ void Topic::AddMsgIter(const MQSparkShPtr& msg_iter)
 {
     m_clents.emplace_back(msg_iter);
 }
+
 void Topic::DelMsgIter(const MQSparkShPtr& msg_iter)
 {
     if(IsExistClent(msg_iter))

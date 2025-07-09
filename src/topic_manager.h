@@ -7,7 +7,7 @@
 #include "topic.h"
 using namespace std;
 using namespace MQ;
-class MQSparkAbstract;
+
 class TopicManager
 {
     SINGLETON(TopicManager)
@@ -15,7 +15,7 @@ public:
     bool AddTopic(const string& topic_name, const MQSparkShPtr& msg_iter);
     bool RemoveTopic(const string& topic_name, const MQSparkShPtr& msg_iter);
     bool PublishMsg(const Message& msg);
-
+    void DelMsgPtr(const MQSparkShPtr& msg_iter);
 private:
     list<Topic> topics;
 };

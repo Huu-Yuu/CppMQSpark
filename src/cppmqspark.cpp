@@ -12,10 +12,16 @@ bool CppMQSpark::PublishMsg(const Message &msg)
 {
     return topic_mgr.PublishMsg(msg);
 }
-bool CppMQSpark::ClientUnsub(const string &topic_name, const MQSparkShPtr &mqs_prt)
+bool CppMQSpark::ClientUnsub(const string &topic_name, const MQSparkShPtr& mqs_prt)
 {
     return topic_mgr.RemoveTopic(topic_name, mqs_prt);
 }
+
+void CppMQSpark::DelClient(const MQSparkShPtr &mqs_prt)
+{
+    topic_mgr.DelMsgPtr(mqs_prt);
+}
+
 CppMQSpark::~CppMQSpark()
 {
 }
