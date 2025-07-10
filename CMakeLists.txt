@@ -12,14 +12,38 @@ elseif(CMAKE_CXX_STANDARD EQUAL 11)
 endif()
 
 # 设置动态库/静态库生成路径
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+
 # 设置头文件搜索路径
 include_directories(
         ${PROJECT_SOURCE_DIR}/include/CppMQSpark
         ${PROJECT_SOURCE_DIR}/src
         ${PROJECT_SOURCE_DIR}/src/utils
 )
-add_library(${PROJECT_NAME} SHARED
+#库文件名称 全小写
+set(LIB_NAME cppmqspark)
+add_library(${LIB_NAME} SHARED
+        src/cppmqspark.cpp
+        src/cppmqspark.h
+        include/CppMQSpark/mqspark_abstract.h           # 外部include 接口
+        include/CppMQSpark/message_interface.cpp
+        include/CppMQSpark/message_interface.h          # 外部include 接口
+        src/abstract_manager.h
+        src/topic_manager.cpp
+        src/topic_manager.h
+        src/topic.cpp
+        src/topic.h
+        src/utils/public_macro.h
+)
+
+###test 测试代码
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+add_executable(mqspark_tests
+        test/main.cpp
+        test/consumer.h
+        test/producer.h
+
         src/cppmqspark.cpp
         src/cppmqspark.h
         include/CppMQSpark/mqspark_abstract.h
@@ -32,29 +56,19 @@ add_library(${PROJECT_NAME} SHARED
         src/topic.h
         src/utils/public_macro.h
 )
-
-###test
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-add_executable(mqspark_tests
-    test/main.cpp
-    test/consumer.h
-    test/producer.h
-
-    src/cppmqspark.cpp
-    src/cppmqspark.h
-    include/CppMQSpark/mqspark_abstract.h
-    include/CppMQSpark/message_interface.cpp
-    include/CppMQSpark/message_interface.h
-    src/abstract_manager.h
-    src/topic_manager.cpp
-    src/topic_manager.h
-    src/topic.cpp
-    src/topic.h
-    src/utils/public_macro.h
-)
 target_link_libraries(mqspark_tests -lpthread)
-###test
+###test 测试代码
 
-install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY include/CppMQSpark/ DESTINATION include/CppMQSpark
+        FILES_MATCHING PATTERN "*.h"
+        PATTERN "*.cpp" EXCLUDE
+)
+
+install(TARGETS ${LIB_NAME}
+        EXPORT CppMQSparkTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+)
 #控制动态库的符号导出（Windows必需）
-target_compile_definitions(${PROJECT_NAME} PRIVATE CppMQSpark_LIBRARY)
+target_compile_definitions(${LIB_NAME} PRIVATE CppMQSpark_LIBRARY)
