@@ -31,9 +31,11 @@ mqs->RegMsgHandleCallback([](const Message& msg) {
 static void MessageHandle(const Message &msg) {
     std::mutex tx;
     tx.lock();
+    static int count = 0;
     std::cout << "Consumer: ----- Get Msg : -----" << std::endl;
     std::cout << "topic: " << msg.topic_name << std::endl;
     std::cout << "msg: " << msg.content << std::endl;
+    std::cout << "count = " << count << std::endl;
     tx.unlock();
 }
 mqs->RegMsgHandleCallback(&MessageHandle);
@@ -41,8 +43,12 @@ mqs->RegMsgHandleCallback(&MessageHandle);
 
 #### 消息发布
 ```cpp
-Message msg("Hello", "test");  // 消息内容 + 主题
-mqs->PublishMessage(msg);
+Message msg1("Hello", "test");  // 消息内容 + 主题
+Message msg2;
+msg2.content = "word";          // 结构体成员赋值
+msg2.topic_name = "test";       // 结构体成员赋值
+mqs->PublishMessage(msg1);
+mqs->PublishMessage(msg2;
 ```
 
 #### 异常处理
@@ -65,7 +71,7 @@ try {
 // 取消单个主题订阅
 mqs->UnsubTopic("test");
 
-// 取消所有订阅（析构时自动调用）
+// 取消所有订阅（需要在析构之前手动调用，否则设置的回调还会被触发）
 mqs->UnsubTopicAll();
 ```
 
