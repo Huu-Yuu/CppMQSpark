@@ -16,9 +16,9 @@ void producerThread() {
     Producer c_;
     for (int i = 0; i < 100; ++i)
     {
-          p_.Send(i , "test");
-          d_.Send(i,"d_test");
-          c_.Send(i, "c_test");
+        p_.Send(i , "test");
+        d_.Send(i,"d_test");
+        c_.Send(i, "c_test");
         std::cout << "Produced: " << i << std::endl;
 //        std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 控制生产速度
     }

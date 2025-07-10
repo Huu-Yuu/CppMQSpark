@@ -23,7 +23,7 @@ MQSparkShPtr mqs = MessageInterface::Create<MessageInterface>();
 ```cpp
 // 方式1：使用lambda表达式设置回调
 mqs->SubTopic("test");
-mqs->RegMsgHandleCallback([](const Message& msg) {
+mqs->RegMsgHandleCallback([&](const Message& msg) {
     std::cout << "收到消息: " << msg.content << std::endl;
 });
 
@@ -49,6 +49,117 @@ msg2.content = "word";          // 结构体成员赋值
 msg2.topic_name = "test";       // 结构体成员赋值
 mqs->PublishMessage(msg1);
 mqs->PublishMessage(msg2;
+```
+
+#### 相对完整的伪代码示例
+```cpp
+#include "message_interface.h"
+using namespace MQ;     //声明命名空间
+// 消息处理回调
+static int count = 0;
+static void MessageHandle(const Message &msg)
+{
+	mutex tx;	// 多线程和多个生产者产生消息，建议加锁
+	tx.lock();
+	count ++;
+	cout << "Consumer: ----- Get Msg : -----" << endl;
+	cout << "topic: " << msg.topic_name << endl;
+	cout << "msg: " << msg.content << endl;
+	cout << "count = "<< count << endl;
+	tx.unlock();
+}
+
+// 消费者线程函数
+void consumerThread() {
+	MQSparkShPtr c_ = MessageInterface::Create<MessageInterface>();	// 实例化一个对象，专门接收消息
+	c_->SubTopic("topic_test");	// 订阅主题
+	c_->RegMsgHandleCallback(&MessageHandle);
+//	c_->UnsubTopicAll();	// 解除所有订阅析构前使用，如果此处没有手动调用，会导致c_ 对象离开作用域后，回调函数还是会被消息触发，如果手动调用，则设置的回调函数不会再被触发
+}
+// 生产者线程函数
+void producerThread() {
+	MQSparkShPtr p_ = MessageInterface::Create<MessageInterface>();	// 实例化两个对象，发送消息
+	MQSparkShPtr t_ = MessageInterface::Create<MessageInterface>();	
+	for (int i = 0; i < 100; ++i)
+	{
+		Message msg(to_string(i), "topic_test");		// 消息类型是string，需要将其他消息转换成str后使用
+		p_->PublishMessage(msg);
+		t_->PublishMessage(msg);
+		std::cout << "Produced: " << i << std::endl;
+	}
+}
+
+int main()
+{
+    cout << " ================ start ================ " << endl;
+    std::thread producer(producerThread);		// 模拟多线程
+    std::thread consumer(consumerThread);
+//    consumerThread();							// 模拟单线程
+//    producerThread();
+
+    producer.join();
+    consumer.join();
+    cout << " ================ end ================ " << endl;
+    return 0;
+}
+
+```
+
+#### 其他用法 - 封装后使用 （参照测试代码）
+```cpp
+#include "message_interface.h"
+using namespace MQ;
+using namespace std;
+// 消息处理类
+class MQHandle
+{
+public:
+    MQHandle() : mqs(MessageInterface::Create<MessageInterface>())
+    {
+        mqs->RegMsgHandleCallback(&MessageHandle);	// 初始化注册消息回调
+    }
+
+    ~MQHandle()
+    {
+        mqs->UnsubTopicAll();	// 析构时注销所有订阅
+        cout << " ------- UnsubTopicAll -------" << endl;
+    }
+
+    void Send(const int& i, const string& topic_name)
+    {
+//        Message msg(to_string(i), topic_name);	// 组装消息
+		Message msg;
+        msg.content = to_string(i);
+        msg.topic_name = topic_name;
+        mqs->PublishMessage(msg);
+    }
+
+    void UnsubTopic(const string& topic_name)
+    {
+         mqs->UnsubTopic(topic_name);	// 注销主题
+    }
+
+    void Listen(const string& topic_name)
+    {
+        mqs->SubTopic(topic_name);	// 订阅主题
+
+    }
+
+    static void MessageHandle(const Message &msg)	// 消息回调
+    {
+        mutex tx;
+        tx.lock();
+        count ++;
+        cout << "Consumer: ----- Get Msg : -----" << endl;
+        cout << "topic: " << msg.topic_name << endl;
+        cout << "msg: " << msg.content << endl;
+        cout << "count = "<< count << endl;
+        tx.unlock();
+    }
+private:
+    static int count;
+    MQSparkShPtr mqs;
+}
 ```
 
 #### 异常处理
