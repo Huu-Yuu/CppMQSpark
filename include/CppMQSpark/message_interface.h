@@ -1,12 +1,16 @@
 /*
 * CppMQSpark - 轻量级C++消息队列库 | Lightweight C++ Message Queue Library
-* 版权所有 (C) 2023 Huu-Yuu | Copyright (C) 2023 Huu-Yuu
+* 版权所有 (C) 2025 Huu-Yuu | Copyright (C) 2025 Huu-Yuu
 *
-* 本程序是自由软件：您可以根据自由软件基金会发布的GNU通用公共许可证第3版或（可选）更高版本重新分发或修改它。
-* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 or (at your option) any later version.
+* 特此授权任何获得本软件者自由使用、修改、合并、发布及分发本软件的权利，
+* 惟须满足以下条件：
+* 1. 在所有副本中保留上述版权声明及本许可声明
+* 2. 本软件按“原样”提供，无任何担保，作者不承担任何责任
 *
-* 本程序基于使用希望而分发，但**没有任何担保**；甚至没有适销性或特定用途适用性的暗示担保。详见GNU通用公共许可证。
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for details.
+* Permission is hereby granted to any person obtaining a copy of this software
+* to use, modify, merge, publish, distribute the software, subject to:
+* 1. Retain above copyright notice and this permission notice
+* 2. The software is provided "AS IS" without warranty, authors not liable
 */
 
 #ifndef C__MQSPARK_MESSAGE_INTERFACE_H
