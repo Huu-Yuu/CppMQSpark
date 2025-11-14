@@ -3,6 +3,8 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![C++ Standard](https://img.shields.io/badge/C++-11/14-blue.svg)](https://en.cppreference.com/)
 
+**🇺🇸 English Version Available: [README_EN.md](README_EN.md)** | **🇺🇸 可点击查看英文版文档**
+
 
 ## MessageInterface 消息接口类
 
