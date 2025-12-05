@@ -2,7 +2,8 @@
 #define C__MQSPARK_TOPIC_H
 #include <memory>
 #include "message_interface.h"
-#include <list>
+#include <unordered_set>
+#include <mutex>
 using namespace std;
 using namespace MQ;
 
@@ -20,7 +21,8 @@ class Topic
         bool IsExistClent(const MQSparkShPtr& msg_iter);
     private:
         string m_name;
-        list<MQSparkShPtr> m_clents;
+        unordered_set<MQSparkShPtr> m_clents;
+        mutex mtx;
 };
 
 

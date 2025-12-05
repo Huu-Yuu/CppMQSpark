@@ -19,6 +19,10 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
 using namespace std;
 
 namespace MQ
@@ -31,6 +35,11 @@ namespace MQ
             content = std::move(cont);
             topic_name = std::move(topic);
         }
+        CppMessage(const CppMessage&) = default;
+        CppMessage(CppMessage&&) = default;
+        CppMessage& operator=(const CppMessage&) = default;
+        CppMessage& operator=(CppMessage&&) = default;
+        
         string content;
         string topic_name;
     } Message;
@@ -47,30 +56,40 @@ namespace MQ
             auto ptr = std::make_shared<T>(std::forward<Args>(args)...);
             return ptr;
         }
-        MQSparkAbstract() = default;
-        virtual ~MQSparkAbstract() = default;
+        
+        MQSparkAbstract();
+        virtual ~MQSparkAbstract();
+        
         virtual void SubTopic(const string &topic_name) = 0;            ///< 订阅主题
         virtual void RegMsgHandleCallback(MessageHandle handle) = 0;    ///< 注册消息处理回调函数
         virtual void UnsubTopic(const string &topic_name) = 0;          ///< 取消订阅主题
         virtual void UnsubTopicAll() = 0;                               ///< 注销全部主题
         virtual void PublishMessage(const Message &msg) = 0;            ///< 发布消息
-        virtual void HandleMessage(const Message &msg)                  ///< 处理消息
-        {
-            if(m_handle_ != nullptr)
-            {
-                m_handle_(msg);
-            }
-        }
+        
+        // 处理消息的重载版本
+        virtual void HandleMessage(const Message &msg);                 ///< 处理消息（拷贝版本）
+        virtual void HandleMessage(Message&& msg);                      ///< 处理消息（移动版本）
 
     protected:
         MessageHandle m_handle_;
+        
     private:
-
-//        MQSparkAbstract() = default;
+        void messageProcessLoop();
+        
+        queue<Message> m_msg_queue;
+        mutex m_msg_mutex;
+        condition_variable m_msg_cv;
+        thread m_worker_thread;
+        bool m_stop_flag;
+        
         MQSparkAbstract(const MQSparkAbstract&) = delete;
         MQSparkAbstract& operator=(const MQSparkAbstract&) = delete;
+        
+        // 移动语义支持
+        MQSparkAbstract(MQSparkAbstract&&) noexcept = default;
+        MQSparkAbstract& operator=(MQSparkAbstract&&) noexcept = default;
     };
 
-}// namespace MQ
+}
 
 #endif//C__MQSPARK_MQSPARK_ABSTRACT_H

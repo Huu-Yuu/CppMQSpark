@@ -56,6 +56,15 @@ namespace MQ
     public:
         MessageInterface();
         ~MessageInterface() override;
+        
+        // 移动语义支持
+        MessageInterface(MessageInterface&&) noexcept = default;
+        MessageInterface& operator=(MessageInterface&&) noexcept = default;
+        
+        // 禁用拷贝
+        MessageInterface(const MessageInterface&) = delete;
+        MessageInterface& operator=(const MessageInterface&) = delete;
+        
         /**
          * @brief 订阅指定主题
          * @param topic_name 主题名称
@@ -100,6 +109,12 @@ namespace MQ
          * @endcode
          */
         void PublishMessage(const Message& msg) override;
+        
+        /**
+         * @brief 发布消息到指定主题（移动版本）
+         * @param msg 消息对象（必须包含有效topic）
+         */
+        void PublishMessage(Message&& msg);
 
     protected:
         /**
@@ -108,6 +123,13 @@ namespace MQ
          * @note 基类默认实现会将消息传递给注册的回调函数
          */
         void HandleMessage(const Message& msg) override;
+        
+        /**
+         * @brief 消息处理虚函数（移动版本，供派生类覆盖）
+         * @param msg 接收到的消息
+         */
+        virtual void HandleMessage(Message&& msg);
+        
     private:
         struct MQImplHide;  ///< 前置声明 PIMPL模式隐藏实现细节
         unique_ptr<MQImplHide> MQImpl_;   ////< 核心实现指针

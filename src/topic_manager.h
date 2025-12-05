@@ -3,6 +3,8 @@
 #include "mqspark_abstract.h"
 #include <memory>
 #include <list>
+#include <unordered_map>
+#include <mutex>
 #include "public_macro.h"
 #include "topic.h"
 using namespace std;
@@ -17,7 +19,8 @@ public:
     bool PublishMsg(const Message& msg);
     void DelMsgPtr(const MQSparkShPtr& msg_iter);
 private:
-    list<Topic> topics;
+    unordered_map<string, unique_ptr<Topic>> topics;
+    mutex mtx;
 };
 
 

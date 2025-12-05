@@ -11,6 +11,14 @@ elseif(CMAKE_CXX_STANDARD EQUAL 11)
     add_compile_definitions(USING_CPP11=1)
 endif()
 
+# 解决 mingw 汇编器不支持特定调试选项的问题
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    # 移除所有现有的 -gdwarf-* 选项
+    string(REGEX REPLACE "-gdwarf-[0-9]+" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    # 添加通用的 -g 选项
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+endif()
+
 # 设置动态库/静态库生成路径
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -26,6 +34,7 @@ set(LIB_NAME cppmqspark)
 add_library(${LIB_NAME} SHARED
         src/cppmqspark.cpp
         src/cppmqspark.h
+        src/mqspark_abstract.cpp
         include/CppMQSpark/mqspark_abstract.h           # 外部include 接口
         include/CppMQSpark/message_interface.cpp
         include/CppMQSpark/message_interface.h          # 外部include 接口
@@ -46,6 +55,7 @@ add_executable(mqspark_tests
 
         src/cppmqspark.cpp
         src/cppmqspark.h
+        src/mqspark_abstract.cpp
         include/CppMQSpark/mqspark_abstract.h
         include/CppMQSpark/message_interface.cpp
         include/CppMQSpark/message_interface.h

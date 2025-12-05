@@ -8,6 +8,9 @@ class CppMQSpark : public std::enable_shared_from_this<CppMQSpark>
 {
     SMART_SINGLETON(CppMQSpark)
 public:
+    CppMQSpark();
+    ~CppMQSpark();
+    
     bool ClientSubTopic(const string& topic_name, const MQSparkShPtr& mqs_ptr);
     bool PublishMsg(const Message& msg);
     bool ClientUnsub(const string& topic_name, const MQSparkShPtr& mqs_prt);

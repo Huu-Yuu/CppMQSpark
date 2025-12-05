@@ -63,7 +63,25 @@ namespace MQ
         }
         MQImpl_->spark_ptr->PublishMsg(msg);
     }
+    
+    void MessageInterface::PublishMessage(Message&& msg)
+    {
+        if(msg.topic_name.empty() || msg.content.empty())
+        {
+            throw invalid_argument("主题名称或者消息内容为空");
+        }
+        MQImpl_->spark_ptr->PublishMsg(std::move(msg));
+    }
+    
     void MessageInterface::HandleMessage(const Message &msg)
+    {
+        if(m_handle_ != nullptr)
+        {
+            m_handle_(msg);
+        }
+    }
+    
+    void MessageInterface::HandleMessage(Message&& msg)
     {
         if(m_handle_ != nullptr)
         {

@@ -18,23 +18,27 @@ public:                                               \
 
 // 增强版：同时支持引用和智能指针（需继承 std::enable_shared_from_this）
 #define SMART_SINGLETON(ClassName)                                                  \
-public:                                                                             \
-    ClassName();                                                                    \
-    ~ClassName();                                                                   \
-                                                                                    \
 private:                                                                            \
     ClassName(const ClassName &) = delete;                                          \
     ClassName &operator=(const ClassName &) = delete;                               \
                                                                                     \
+private:                                                                           \
+    struct SingletonHelper                                                          \
+    {                                                                               \
+        static std::shared_ptr<ClassName> &GetInstance()                            \
+        {                                                                           \
+            static std::shared_ptr<ClassName> instance = std::make_shared<ClassName>(); \
+            return instance;                                                        \
+        }                                                                           \
+    };                                                                              \
+                                                                                    \
 public:                                                                             \
     static ClassName &GetInstance()                                                 \
     {                                                                               \
-        static std::shared_ptr<ClassName> instance = std::make_shared<ClassName>(); \
-        return *instance;                                                           \
+        return *SingletonHelper::GetInstance();                                     \
     }                                                                               \
     static std::shared_ptr<ClassName> GetSharedInstance()                           \
     {                                                                               \
-        static std::shared_ptr<ClassName> instance = std::make_shared<ClassName>(); \
-        return instance;                                                            \
+        return SingletonHelper::GetInstance();                                      \
     }
 #endif//C__MQSPARK_PUBLIC_MACRO_H

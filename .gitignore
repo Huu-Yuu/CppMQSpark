@@ -44,3 +44,8 @@
 # debug information files
 *.dwo
 build
+.vscode
+.vs
+cmake-build-debug-mingw
+cmake-build-debug
+cmake-build-debug-visual-studio
